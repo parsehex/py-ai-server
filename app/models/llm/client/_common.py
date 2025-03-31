@@ -1,6 +1,14 @@
 from typing import Optional, Any
 from pydantic import BaseModel, Field
 
+class MessageObject(BaseModel):
+	role: str = Field(
+		...,
+		description='Message role.',
+		examples=['system', 'user', 'assistant']
+	)
+	content: str = Field(..., description='Message content.')
+
 class CompletionOptions(BaseModel):
 	"""Generic model, to be passed to manager, which will convert to model-specific options."""
 	# Common options

@@ -4,7 +4,6 @@ from fastapi.responses import JSONResponse
 from huggingface_hub import snapshot_download
 from app.args import Args
 from app.client import llm_client_manager
-from app.client.llm import LLMClient_OpenAI
 from app.models.llm.llm_api import CompletionRequest, CompletionResponse, DownloadModelRequest, DownloadModelResponse, ListModelsResponse, GetModelResponse, LoadModelResponse, UnloadModelRequest, LoadModelRequest
 from app.models.llm.client import CompletionOptions, MessageObject
 from app.utils import prompt_format
@@ -15,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 def llm_api(app: FastAPI):
 	manager = llm_client_manager.LLMManager.instance
-	openai = LLMClient_OpenAI.instance
 
 	def modelName():
 		if manager.model_name is not None:
@@ -150,6 +148,20 @@ def llm_api(app: FastAPI):
 			time.time() - start
 		})
 
+	# chat
+	def chat(req: CompletionRequest):
+		# there's no prompt or parts, just messages
+		messages = req.messages
+		model = req.model
+		if model == '':
+			model = manager.model_name or ''
+		# if len(messages) == 0:
+		# 	raise Exception('Messages is required.')
+		# options = CompletionOptions.model_validate(req.model_dump())
+		result = manager.chat(req.model_dump())
+		assert result is not None
+		return result
+
 	def complete(req: CompletionRequest):
 		# TODO accept a "json_format" which can take some kind of specfor json
 		#   we'll use whatever json-constraints the current loader exposes if any
@@ -274,6 +286,19 @@ def llm_api(app: FastAPI):
 					'type': 'download_model',
 					'data': res
 				})
+
+	@app.post(
+		'/llm/v1/chat',
+		response_model=CompletionResponse,
+		tags=['llm']
+	)
+	async def llm_chat(req: CompletionRequest):
+		"""Chat with the model. Provide a list of messages."""
+		if manager.model_name is None and req.model is None:
+			raise HTTPException(
+				status_code=500, detail='Model not loaded.'
+			)
+		return chat(req)
 
 	@app.post(
 		'/llm/v1/complete',

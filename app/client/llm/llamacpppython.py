@@ -110,16 +110,15 @@ class LLMClient_LlamaCppPython(LLMClient_Base):
 		self.config = None
 		self.loaded = False
 
-	def chat(self, options: CompletionOptions_LlamaCppPython):
+	def chat(self, o):
 		if not self.loaded or self.model is None:
 			raise Exception('No model loaded.')
-		assert isinstance(options, CompletionOptions_LlamaCppPython)
+		# assert isinstance(options, CompletionOptions_LlamaCppPython)
 		start = time.time()
-		o = options.model_dump()
-		o = {k: v for k, v in o.items() if v is not None}
+		# o = options.model_dump()
+		# o = {k: v for k, v in o.items() if v is not None}
 
 		result = self.model.create_chat_completion(**o)
-		# result = self.model.create_completion(**o)
 		end = time.time()
 		logger.debug(f'Generated text in {end - start}s')
 		return {

@@ -1,6 +1,6 @@
 from typing import Generator, List, Dict, Union, Any
 from app.models.llm.llm_api import CompletionReturn
-from app.models.llm.client import CompletionOptions, CompletionOptions_LlamaCppPython, CompletionOptions_Exllamav2
+from app.models.llm.client import CompletionOptions, CompletionOptions_LlamaCppPython
 from app.settings import DEVICE_MAP
 
 class LLMClient_Base:
@@ -26,8 +26,7 @@ class LLMClient_Base:
 
 	def map_options_from_model(
 		self, options: CompletionOptions, model: Any
-	) -> Union[CompletionOptions_LlamaCppPython,
-							CompletionOptions_Exllamav2]:
+	) -> CompletionOptions_LlamaCppPython:
 		if options is None or (
 			options.prompt is None and len(options.messages) == 0
 		):
@@ -77,23 +76,20 @@ class LLMClient_Base:
 		raise NotImplementedError()
 
 	def generate(
-		self, options: Union[CompletionOptions_LlamaCppPython,
-													CompletionOptions_Exllamav2]
+		self, options: CompletionOptions_LlamaCppPython
 	) -> Generator:
 		"""(TODO) Generate text from a prompt. Returns a Generator."""
 		raise NotImplementedError()
 
 	def complete(
-		self, options: Union[CompletionOptions_LlamaCppPython,
-													CompletionOptions_Exllamav2]
+		self, options: CompletionOptions_LlamaCppPython
 	) -> CompletionReturn:
 		"""Generate text from a prompt. Returns a string."""
 		raise NotImplementedError()
 
 	def chat(
 		self, messages: List[Dict],
-		options: Union[CompletionOptions_LlamaCppPython,
-										CompletionOptions_Exllamav2]
+		options: CompletionOptions_LlamaCppPython
 	):
 		# not implemented anywhere
 		raise NotImplementedError()

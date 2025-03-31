@@ -1,6 +1,6 @@
 # py-ai-server
 
-As of October 2024 I'm using an M1 Mac and I've started on a slimmed-down version of this project that uses MLX. See the [MLX branch](https://github.com/parsehex/py-ai-server/tree/mlx).
+This is the MLX version of this repo.
 
 ## Overview
 
@@ -14,7 +14,7 @@ The rest of this README and likely other places is out of date. I had the projec
 
 ## Setup
 
-`../setup-linux.sh`
+`./setup.sh` and then `./start.sh --llm` to start the server with the LLM API.
 
 ## Structure Info
 

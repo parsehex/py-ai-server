@@ -29,6 +29,7 @@ model_formats = {
 	'*solar-10.7b-instruct*': 'UserAssistantNewlines',
 	'*nous-hermes-2-solar-10.7b*': 'ChatML',
 	'*openchat-3.5-1210*': 'OpenChatCorrect',
+	'*llama-3*': 'ChatML',
 }
 
 class Formatter:

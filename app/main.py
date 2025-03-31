@@ -1,7 +1,3 @@
-import torch
-
-torch.cuda.empty_cache()
-
 import argparse, logging, os
 import uvicorn, fastapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -142,15 +138,6 @@ if __name__ == '__main__':
 	logging.basicConfig(level=args.log_level)
 	logger = logging.getLogger(__name__)
 
-	totalmem = torch.cuda.get_device_properties(0).total_memory
-	totalmem /= 1024**3
-	usedmem = torch.cuda.memory_allocated(0)
-	usedmem /= 1024**3
-	freemem = totalmem - usedmem
-	logger.debug(f'Total GPU memory: {totalmem:.2f} GB')
-	if freemem < 1:
-		raise RuntimeError('Not enough GPU memory to run LLM.')
-
 	llm_model = Args['llm_model']
 	tts_model = Args['tts_model']
 
@@ -165,29 +152,19 @@ if __name__ == '__main__':
 		allow_headers=["*"],
 	)
 
-	if args.llm or args.openai:
-		if args.openai:
-			from llama_cpp.server.__main__ import main
-			import sys
-			model_path = os.path.join(LLM_MODELS_DIR, llm_model)
-			os.environ['PORT'] = str(args.port + 1)
-			sys.argv = [
-				'llama_cpp.server', '--model', model_path,
-				'--n_gpu_layers', '35', '--cache', 'true'
-			]
-			main()
-		else:
-			from app.api.llm_api import llm_api
-			from app.client.llm_client_manager import LLMManager
-			llmManager = LLMManager.instance
-			if llm_model is not None:
-				fmt = prompt_format.get_model_format(llm_model)
-				logger.info(f'Loading LLM model: {llm_model}')
-				logger.info(f'Detected model prompt format: {fmt}')
-			llmManager.load_model(llm_model)
-			llm_api(app)
+	if args.llm:
+		from app.api.llm_api import llm_api
+		from app.client.llm_client_manager import LLMManager
+		llmManager = LLMManager.instance
+		if llm_model is not None:
+			fmt = prompt_format.get_model_format(llm_model)
+			logger.info(f'Loading LLM model: {llm_model}')
+			logger.info(f'Detected model prompt format: {fmt}')
+		llmManager.load_model(llm_model)
+		llm_api(app)
 
 	if args.tts:
+		# TODO
 		from app.api.tts_api import tts_api
 		from app.client.tts_client_manager import TTSManager
 		ttsManager = TTSManager.instance
@@ -195,6 +172,7 @@ if __name__ == '__main__':
 		tts_api(app)
 
 	if args.stt:
+		# TODO
 		from app.api.stt_api import stt_api
 		from app.client.stt_client_manager import STTManager
 		sttManager = STTManager.instance
@@ -206,6 +184,7 @@ if __name__ == '__main__':
 		stt_api(app)
 
 	if args.img:
+		# TODO
 		from app.api.img_api import img_api
 		from app.client.img_client_manager import ImgManager
 		imgManager = ImgManager.instance
